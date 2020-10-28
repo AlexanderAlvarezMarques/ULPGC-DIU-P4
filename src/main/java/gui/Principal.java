@@ -1,16 +1,11 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package gui;
 
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.Point;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import javax.swing.JOptionPane;
 
 /**
  * @author Alexander Álvarez Marques
@@ -72,6 +67,11 @@ public class Principal extends javax.swing.JFrame {
         labelTraceColor.setText("Trace color:");
 
         comboBoxTraceColor.setModel(new javax.swing.DefaultComboBoxModel<>(getColorList()));
+        comboBoxTraceColor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                comboBoxTraceColorActionPerformed(evt);
+            }
+        });
 
         labelDrawSize.setText("Select draw size:");
 
@@ -102,10 +102,11 @@ public class Principal extends javax.swing.JFrame {
                     .addComponent(labelTraceColor)
                     .addComponent(labelDrawSize))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(panelConfigurationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(comboBoxBackgroundColor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(comboBoxTraceColor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(sliderDrawSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(panelConfigurationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(sliderDrawSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(panelConfigurationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(comboBoxBackgroundColor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(comboBoxTraceColor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -201,6 +202,12 @@ public class Principal extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void comboBoxBackgroundColorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboBoxBackgroundColorActionPerformed
+        if (!checkColorSelection()) {
+            JOptionPane.showMessageDialog(null, "Not allowed to select same color as trace");
+            int index = comboBoxBackgroundColor.getSelectedIndex();
+            comboBoxBackgroundColor.setSelectedIndex(index == 0 ? 1 : index - 1);
+        }
+        
         setBackgroundColor();
     }//GEN-LAST:event_comboBoxBackgroundColorActionPerformed
 
@@ -210,37 +217,52 @@ public class Principal extends javax.swing.JFrame {
         try {
             Thread.sleep(75);
         } catch (InterruptedException e) {
-            
+
         }
     }//GEN-LAST:event_tracertZoneMouseMoved
 
     private void tracertZoneMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tracertZoneMouseExited
         tracertZone.clearQueue();
     }//GEN-LAST:event_tracertZoneMouseExited
-    
+
+    private void comboBoxTraceColorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboBoxTraceColorActionPerformed
+        if (!checkColorSelection()) {
+            JOptionPane.showMessageDialog(null, "Not allowed to select same color as background");
+            int index = comboBoxTraceColor.getSelectedIndex();
+            comboBoxTraceColor.setSelectedIndex(index == 0 ? 1 : index - 1);
+        }
+    }//GEN-LAST:event_comboBoxTraceColorActionPerformed
+
+    private boolean checkColorSelection() {
+
+        return !((String) comboBoxBackgroundColor.getSelectedItem()).equals(
+                (String) comboBoxTraceColor.getSelectedItem());
+
+    }
+
     private void setSelectedComboBoxItems() {
         comboBoxBackgroundColor.setSelectedIndex(1);
         comboBoxTraceColor.setSelectedIndex(4);
     }
-    
+
     private void setBackgroundColor() {
         String selection = (String) comboBoxBackgroundColor.getSelectedItem();
         Color color = colorList.get(selection);
         tracertZone.setBackground(color);
     }
-    
+
     private int getDrawSize() {
         return sliderDrawSize.getValue();
     }
-    
+
     private Color getDrawColor() {
         return colorList.get((String) comboBoxTraceColor.getSelectedItem());
     }
 
-    private String [] getColorList() {
+    private String[] getColorList() {
         Set<String> colors = colorList.keySet();
-        Object [] c = colors.toArray();
-        String [] l = new String [c.length];
+        Object[] c = colors.toArray();
+        String[] l = new String[c.length];
         System.arraycopy(c, 0, l, 0, c.length);
         return l;
     }
@@ -249,13 +271,13 @@ public class Principal extends javax.swing.JFrame {
         sliderDrawSize.setMinimum(5);
         sliderDrawSize.setMaximum(20);
         sliderDrawSize.setValue(13);
-        
+
         sliderDrawSize.setMajorTickSpacing(5);
         sliderDrawSize.setMinorTickSpacing(1);
         sliderDrawSize.setPaintTicks(true);
         sliderDrawSize.setPaintLabels(true);
     }
-    
+
     private void initColorMap() {
         colorList = new HashMap<>();
 
